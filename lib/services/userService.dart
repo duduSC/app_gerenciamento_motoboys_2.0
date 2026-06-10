@@ -1,0 +1,33 @@
+import 'dart:convert';
+
+import 'package:app_gerenciamento_motoboys/model/user.dart';
+import 'package:http/http.dart' as http;
+
+class UserService {
+  static final String _url =
+      "https://68d1ccfde6c0cbeb39a5d531.mockapi.io/users";
+  static final Uri _uri = Uri.parse(_url);
+
+  Future<List<User>> getUsers() async {
+    final response = await http.get(_uri);
+    if (response.statusCode == 200) {
+      List<dynamic> data = jsonDecode(response.body);
+      return data.map((user) => User.fromJson(user)).toList();
+    } else {
+      throw Exception("Falha ao buscar usuarios ${response.statusCode}");
+    }
+  }
+
+  Future<User> createUser(User user) async {
+    final response = await http.post(
+      _uri,
+      headers: {"Content-Type": "Application/json"},
+      body: json.encode(user.toJson()),
+    );
+    if (response.statusCode == 201 || response.statusCode == 200) {
+      return User.fromJson(json.decode(response.body));
+    } else {
+      throw Exception("Usuario nao foi criado: ${response.statusCode}");
+    }
+  }
+}
