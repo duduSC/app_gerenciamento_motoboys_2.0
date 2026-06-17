@@ -1,5 +1,6 @@
-import 'package:app_gerenciamento_motoboys/main.dart';
+import 'package:app_gerenciamento_motoboys/locator.dart';
 import 'package:app_gerenciamento_motoboys/provider/userProvider.dart';
+import 'package:app_gerenciamento_motoboys/services/temaService.dart';
 import 'package:app_gerenciamento_motoboys/wigdets/menuDrawer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -10,6 +11,9 @@ class Config extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<Userprovider>(context).user;
+    // Obtém a instância do TemaService através do locator.
+    final temaService = locator<TemaService>();
+
     return Scaffold(
       drawer: const Menudrawer(),
       appBar: AppBar(centerTitle: true, title: const Text('Configurações')),
