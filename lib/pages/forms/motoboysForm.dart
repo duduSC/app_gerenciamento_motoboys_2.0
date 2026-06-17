@@ -1,11 +1,11 @@
+import 'package:app_gerenciamento_motoboys/locator.dart';
 import 'package:app_gerenciamento_motoboys/model/motoboy.dart';
 import 'package:app_gerenciamento_motoboys/services/motoboyService.dart';
 import 'package:flutter/material.dart';
 
 class Motoboysform extends StatefulWidget {
-  final MotoboyService service;
   final Motoboy? initial;
-  const Motoboysform({super.key, required this.service, this.initial});
+  const Motoboysform({super.key, this.initial});
 
   @override
   State<Motoboysform> createState() => _MotoboysformState();
@@ -13,6 +13,9 @@ class Motoboysform extends StatefulWidget {
 
 class _MotoboysformState extends State<Motoboysform> {
   final _formKey = GlobalKey<FormState>();
+  // Obtém o serviço diretamente do locator
+  final _service = locator<MotoboyService>();
+
   late TextEditingController _nome;
   late TextEditingController _cpf;
   late TextEditingController _telefone;
@@ -24,7 +27,7 @@ class _MotoboysformState extends State<Motoboysform> {
     super.initState();
     _nome = TextEditingController(text: widget.initial?.nome ?? "");
     _cpf = TextEditingController(text: widget.initial?.cpf ?? "");
-    _telefone = TextEditingController(text: widget.initial?.cpf ?? "");
+    _telefone = TextEditingController(text: widget.initial?.telefone ?? "");
   }
 
   @override
@@ -47,9 +50,9 @@ class _MotoboysformState extends State<Motoboysform> {
       );
 
       if (widget.initial == null) {
-        await widget.service.createMotoboy(model);
+        await _service.createMotoboy(model);
       } else {
-        await widget.service.updateMotoboy(model);
+        await _service.updateMotoboy(model);
       }
       if (mounted) Navigator.of(context).pop(true);
     } catch (e) {
@@ -86,7 +89,7 @@ class _MotoboysformState extends State<Motoboysform> {
 
     setState(() => _saving = true);
     try {
-      await widget.service.deleteMotoboy(widget.initial!.id!);
+      await _service.deleteMotoboy(widget.initial!.id!);
       if (mounted) Navigator.of(context).pop(true);
     } catch (e) {
       if (mounted) {
@@ -135,6 +138,7 @@ class _MotoboysformState extends State<Motoboysform> {
                   validator: (v) {
                     final value = v?.trim() ?? '';
                     if (value.isEmpty || v == null) return 'Informe o CPF';
+                    return null; // Adicionado retorno nulo para validação bem-sucedida
                   },
                 ),
                 const SizedBox(height: 24),
@@ -144,6 +148,7 @@ class _MotoboysformState extends State<Motoboysform> {
                   validator: (v) {
                     final value = v?.trim() ?? '';
                     if (value.isEmpty || v == null) return 'Informe o telefone';
+                    return null; // Adicionado retorno nulo para validação bem-sucedida
                   },
                 ),
                 const SizedBox(height: 24),

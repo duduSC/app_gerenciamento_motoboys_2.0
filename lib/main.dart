@@ -1,28 +1,22 @@
-import 'package:app_gerenciamento_motoboys/pages/config.dart';
-import 'package:app_gerenciamento_motoboys/pages/forms/usersForm.dart';
-import 'package:app_gerenciamento_motoboys/pages/gerenciaTeles.dart';
-import 'package:app_gerenciamento_motoboys/pages/home.dart';
-import 'package:app_gerenciamento_motoboys/pages/login.dart';
-import 'package:app_gerenciamento_motoboys/pages/motoboys.dart';
-import 'package:app_gerenciamento_motoboys/pages/forms/motoboysForm.dart';
-import 'package:app_gerenciamento_motoboys/pages/sobre.dart';
+import 'package:app_gerenciamento_motoboys/locator.dart';
 import 'package:app_gerenciamento_motoboys/provider/userProvider.dart';
 import 'package:app_gerenciamento_motoboys/router.dart';
-import 'package:app_gerenciamento_motoboys/services/motoboyService.dart';
 import 'package:app_gerenciamento_motoboys/services/temaService.dart';
-import 'package:app_gerenciamento_motoboys/services/userService.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 
-final temaService = TemaService();
-final userService = UserService();
-final motoboyService = MotoboyService();
-
 Future<void> main() async {
+  // Garante que o Flutter está inicializado
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Carrega as variáveis de ambiente
   await dotenv.load(fileName: ".env");
-  await Future.delayed(Duration(milliseconds: 50));
+
+  // Configura o Service Locator (registra os serviços)
+  setupLocator();
+
+  // Inicia a aplicação
   runApp(
     ChangeNotifierProvider(
       create: (context) => Userprovider(),
@@ -36,6 +30,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Obtém a instância do TemaService através do locator
+    final temaService = locator<TemaService>();
+
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: temaService.temaNotifier,
       builder: (context, currentMode, child) {
@@ -50,53 +47,8 @@ class MyApp extends StatelessWidget {
           ),
           themeMode: currentMode,
           initialRoute: Routes.login,
-          onGenerateRoute: (settings) {
-            switch (settings.name) {
-              case Routes.login:
-                return MaterialPageRoute(
-                  settings: const RouteSettings(name: Routes.login),
-                  builder: (_) => const Login(),
-                );
-              case Routes.home:
-                return MaterialPageRoute(
-                  settings: const RouteSettings(name: Routes.home),
-                  builder: (_) => const Home(),
-                );
-              case Routes.usersForm:
-                return MaterialPageRoute(
-                  settings: const RouteSettings(name: Routes.usersForm),
-                  builder: (_) => Usersform(service: userService),
-                );
-              case Routes.motoboys:
-                return MaterialPageRoute(
-                  settings: const RouteSettings(name: Routes.motoboys),
-                  builder: (_) => Motoboys(service: motoboyService),
-                );
-              case Routes.motoboyForm:
-                return MaterialPageRoute(
-                  settings: const RouteSettings(name: Routes.motoboyForm),
-                  builder: (_) => Motoboysform(service: motoboyService),
-                );
-              case Routes.teles:
-                return MaterialPageRoute(
-                  settings: const RouteSettings(name: Routes.teles),
-                  builder: (_) =>
-                      GerenciamentoTelesPage(service: motoboyService),
-                );
-              case Routes.sobre:
-                return MaterialPageRoute(
-                  settings: const RouteSettings(name: Routes.sobre),
-                  builder: (_) => Sobre(),
-                );
-              case Routes.config:
-                return MaterialPageRoute(
-                  settings: const RouteSettings(name: Routes.config),
-                  builder: (_) => Config(),
-                );
-              default:
-                return MaterialPageRoute(builder: (_) => const Login());
-            }
-          },
+          // Usa o AppRouter para gerar todas as rotas
+          onGenerateRoute: AppRouter.generateRoute,
         );
       },
     );

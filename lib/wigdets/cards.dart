@@ -16,7 +16,7 @@ class CardNavegacao extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context,paginaDestino);
+        Navigator.pushNamed(context, paginaDestino);
       },
       child: Card(
         elevation: 5,
@@ -35,6 +35,45 @@ class CardNavegacao extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class MotoboyCard extends StatelessWidget {
+  final String nome;
+  final VoidCallback onTap;
+
+  const MotoboyCard({
+    super.key,
+    required this.nome,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: ListTile(
+                  title: Text(
+                    nome,
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ),
+              const Icon(Icons.arrow_forward),
             ],
           ),
         ),
