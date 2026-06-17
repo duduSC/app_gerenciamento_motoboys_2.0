@@ -1,11 +1,11 @@
+import 'package:app_gerenciamento_motoboys/locator.dart';
 import 'package:app_gerenciamento_motoboys/model/motoboy.dart';
 import 'package:app_gerenciamento_motoboys/services/motoboyService.dart';
 import 'package:flutter/material.dart';
 
 class Motoboysform extends StatefulWidget {
-  final MotoboyService service;
   final Motoboy? initial;
-  const Motoboysform({super.key, required this.service, this.initial});
+  const Motoboysform({super.key, this.initial});
 
   @override
   State<Motoboysform> createState() => _MotoboysformState();
@@ -13,6 +13,7 @@ class Motoboysform extends StatefulWidget {
 
 class _MotoboysformState extends State<Motoboysform> {
   final _formKey = GlobalKey<FormState>();
+  final _service = locator<MotoboyService>();
   late TextEditingController _nome;
   late TextEditingController _cpf;
   late TextEditingController _telefone;
@@ -24,7 +25,7 @@ class _MotoboysformState extends State<Motoboysform> {
     super.initState();
     _nome = TextEditingController(text: widget.initial?.nome ?? "");
     _cpf = TextEditingController(text: widget.initial?.cpf ?? "");
-    _telefone = TextEditingController(text: widget.initial?.cpf ?? "");
+    _telefone = TextEditingController(text: widget.initial?.telefone ?? "");
   }
 
   @override
@@ -47,9 +48,9 @@ class _MotoboysformState extends State<Motoboysform> {
       );
 
       if (widget.initial == null) {
-        await widget.service.createMotoboy(model);
+        await _service.createMotoboy(model);
       } else {
-        await widget.service.updateMotoboy(model);
+        await _service.updateMotoboy(model);
       }
       if (mounted) Navigator.of(context).pop(true);
     } catch (e) {
@@ -86,7 +87,7 @@ class _MotoboysformState extends State<Motoboysform> {
 
     setState(() => _saving = true);
     try {
-      await widget.service.deleteMotoboy(widget.initial!.id!);
+      await _service.deleteMotoboy(widget.initial!.id!);
       if (mounted) Navigator.of(context).pop(true);
     } catch (e) {
       if (mounted) {
@@ -132,19 +133,15 @@ class _MotoboysformState extends State<Motoboysform> {
                 TextFormField(
                   controller: _cpf,
                   decoration: const InputDecoration(labelText: 'CPF'),
-                  validator: (v) {
-                    final value = v?.trim() ?? '';
-                    if (value.isEmpty || v == null) return 'Informe o CPF';
-                  },
+                   validator: (v) =>
+                      (v == null || v.trim().isEmpty) ? 'Informe o CPF' : null,
                 ),
                 const SizedBox(height: 24),
                 TextFormField(
                   controller: _telefone,
                   decoration: const InputDecoration(labelText: 'Telefone'),
-                  validator: (v) {
-                    final value = v?.trim() ?? '';
-                    if (value.isEmpty || v == null) return 'Informe o telefone';
-                  },
+                   validator: (v) =>
+                      (v == null || v.trim().isEmpty) ? 'Informe o telefone' : null,
                 ),
                 const SizedBox(height: 24),
                 FilledButton.icon(

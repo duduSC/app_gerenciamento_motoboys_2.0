@@ -1,3 +1,4 @@
+import 'package:app_gerenciamento_motoboys/locator.dart';
 import 'package:app_gerenciamento_motoboys/model/motoboy.dart';
 import 'package:app_gerenciamento_motoboys/model/tele.dart';
 import 'package:app_gerenciamento_motoboys/services/mapsService.dart';
@@ -7,14 +8,14 @@ import 'package:app_gerenciamento_motoboys/wigdets/menuDrawer.dart';
 import 'package:flutter/material.dart';
 
 class GerenciamentoTelesPage extends StatefulWidget {
-  final MotoboyService service;
-  const GerenciamentoTelesPage({super.key, required this.service});
+  const GerenciamentoTelesPage({super.key});
 
   @override
   State<GerenciamentoTelesPage> createState() => _GerenciamentoTelesPageState();
 }
 
 class _GerenciamentoTelesPageState extends State<GerenciamentoTelesPage> {
+  final _service = locator<MotoboyService>();
   late Future<List<Motoboy>> _futureMotoboys;
   final Map<String, TextEditingController> _controllers = {};
 
@@ -31,7 +32,7 @@ class _GerenciamentoTelesPageState extends State<GerenciamentoTelesPage> {
 
   void _reload() {
     setState(() {
-      _futureMotoboys = widget.service.getMotoboys();
+      _futureMotoboys = _service.getMotoboys();
     });
   }
 
@@ -57,12 +58,12 @@ class _GerenciamentoTelesPageState extends State<GerenciamentoTelesPage> {
       final novaTele = Tele(endereco: enderecoDestino, valor: valor);
       final tele_final = novaTele.toString();
 
-      await widget.service.createTele(
+      await _service.createTele(
         idMotoboy: motoboyId,
         novaTele: tele_final,
       );
 
-      Navigator.pop(context); // Fecha o indicador de carregamento
+      Navigator.pop(context); 
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -74,7 +75,7 @@ class _GerenciamentoTelesPageState extends State<GerenciamentoTelesPage> {
       _controllers[motoboyId]?.clear();
       _reload();
     } catch (e) {
-      Navigator.pop(context); // Fecha o indicador de carregamento
+      Navigator.pop(context); 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("Erro ao adicionar: $e"),

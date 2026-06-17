@@ -1,11 +1,11 @@
+import 'package:app_gerenciamento_motoboys/locator.dart';
 import 'package:app_gerenciamento_motoboys/model/user.dart';
 import 'package:app_gerenciamento_motoboys/router.dart';
 import 'package:app_gerenciamento_motoboys/services/userService.dart';
 import 'package:flutter/material.dart';
 
 class Usersform extends StatefulWidget {
-  final UserService service;
-  const Usersform({super.key, required this.service});
+  const Usersform({super.key});
 
   @override
   State<Usersform> createState() => _UsersformState();
@@ -13,6 +13,7 @@ class Usersform extends StatefulWidget {
 
 class _UsersformState extends State<Usersform> {
   final _formKey = GlobalKey<FormState>();
+  final _service = locator<UserService>();
   final _username = TextEditingController();
   final _password = TextEditingController();
   bool _saving = false;
@@ -35,13 +36,13 @@ class _UsersformState extends State<Usersform> {
         senha: _password.text.trim(),
       );
 
-      await widget.service.createUser(model);
+      await _service.createUser(model);
 
       if (mounted) {
         Navigator.pushReplacementNamed(context, Routes.login);
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Usuário $_username criado!')));
+        ).showSnackBar(SnackBar(content: Text('Usuário ${_username.text} criado!')));
       }
     } catch (e) {
       if (mounted) {
@@ -88,7 +89,7 @@ class _UsersformState extends State<Usersform> {
                     ),
                   ),
                   obscureText: _obscure,
-                  onFieldSubmitted: (_) => _save,
+                  onFieldSubmitted: (_) => _save(),
                   validator: (v) {
                     if (v == null || v.isEmpty) {
                       return 'Informe a senha';
