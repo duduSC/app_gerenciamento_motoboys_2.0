@@ -1,4 +1,5 @@
 import 'package:app_gerenciamento_motoboys/locator.dart';
+import 'package:app_gerenciamento_motoboys/model/motoboy.dart';
 import 'package:app_gerenciamento_motoboys/pages/config.dart';
 import 'package:app_gerenciamento_motoboys/pages/forms/motoboysForm.dart';
 import 'package:app_gerenciamento_motoboys/pages/forms/usersForm.dart';
