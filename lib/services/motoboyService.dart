@@ -1,26 +1,28 @@
 import 'dart:convert';
-
 import 'package:app_gerenciamento_motoboys/model/motoboy.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 class MotoboyService {
-  static String _url = "https://68d1ccfde6c0cbeb39a5d531.mockapi.io/motoboys";
-  final Uri _uri = Uri.parse(_url);
+  // A URL agora é um caminho relativo para funcionar com o reverse proxy
+  static String _baseUrl = dotenv.env['API_URL'] ?? '/api';
 
   Future<List<Motoboy>> getMotoboys() async {
-    final response = await http.get(_uri);
+    final url = '$_baseUrl/motoboys';
+    final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
       List<dynamic> data = jsonDecode(response.body);
-      return data.map((user) {
-        return Motoboy.fromJson(user);
-      }).toList();
+      return data.map((user) => Motoboy.fromJson(user)).toList();
     } else {
-      throw Exception("Falha ao buscar motoboys ${response.statusCode}");
+      throw Exception(
+        "Falha ao buscar motoboys.\n Código: ${response.statusCode}\n Request : ${response.request} \n Body: ${response.body} ",
+      );
     }
   }
 
-  Future<Motoboy> getMotoboy(String id) async {
-    final response = await http.get(Uri.parse("$_uri/$id"));
+  Future<Motoboy> getMotoboy(String cpf) async {
+    final url = '$_baseUrl/motoboys/$cpf';
+    final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
       return Motoboy.fromJson(json.decode(response.body));
     } else {
@@ -29,8 +31,9 @@ class MotoboyService {
   }
 
   Future<Motoboy> createMotoboy(Motoboy motoboy) async {
+    final url = '$_baseUrl/motoboys';
     final response = await http.post(
-      _uri,
+      Uri.parse(url),
       headers: {"Content-Type": "Application/json"},
       body: json.encode(motoboy.toJsonEdit()),
     );
@@ -42,8 +45,9 @@ class MotoboyService {
   }
 
   Future<Motoboy> updateMotoboy(Motoboy motoboy) async {
+    final url = '$_baseUrl/motoboys/${motoboy.id}';
     final response = await http.put(
-      Uri.parse("$_uri/${motoboy.id}"),
+      Uri.parse(url),
       headers: {"Content-Type": "application/json"},
       body: json.encode(motoboy.toJson()),
     );
@@ -62,8 +66,9 @@ class MotoboyService {
     motoboy.teles = motoboy.teles ?? [];
     motoboy.teles!.add(novaTele);
 
+    final url = '$_baseUrl/motoboys/${motoboy.id}';
     final response = await http.put(
-      Uri.parse("$_uri/${motoboy.id}"),
+      Uri.parse(url),
       headers: {"Content-Type": "application/json"},
       body: json.encode(motoboy.toJson()),
     );
@@ -76,7 +81,8 @@ class MotoboyService {
   }
 
   Future<void> deleteMotoboy(String id) async {
-    final response = await http.delete(Uri.parse("$_uri/$id"));
+    final url = '$_baseUrl/motoboys/$id';
+    final response = await http.delete(Uri.parse(url));
     if (response.statusCode != 200 && response.statusCode != 204) {
       throw Exception('Falha ao remover usuário (${response.statusCode})');
     }

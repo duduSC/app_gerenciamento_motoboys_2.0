@@ -1,15 +1,15 @@
 import 'dart:convert';
 
 import 'package:app_gerenciamento_motoboys/model/user.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 class UserService {
-  static final String _url =
-      "https://68d1ccfde6c0cbeb39a5d531.mockapi.io/users";
-  static final Uri _uri = Uri.parse(_url);
+  static final String _baseUrl = dotenv.env['API_URL'] ?? '/api';
 
   Future<List<User>> getUsers() async {
-    final response = await http.get(_uri);
+    final url = '$_baseUrl/users';
+    final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
       List<dynamic> data = jsonDecode(response.body);
       return data.map((user) => User.fromJson(user)).toList();
@@ -19,8 +19,9 @@ class UserService {
   }
 
   Future<User> createUser(User user) async {
+    final url = '$_baseUrl/users';
     final response = await http.post(
-      _uri,
+      Uri.parse(url),
       headers: {"Content-Type": "Application/json"},
       body: json.encode(user.toJson()),
     );
